@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: rgb(27, 160, 165);
+            text-align: center;
+            padding: 0.1em;
+            margin: 0;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input{
+            max-width: 800px;
+            margin: 2px auto;
+            padding: 7px;
+            background-color: rgb(210, 221, 235);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        img {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgb(209, 214, 148);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .product {
+            background-color: #a2b8b4;
+        }
+        h4 {
+            background-color: #333;
+            color: rgb(220, 240, 240);
+            text-align: center;
+            padding: 1em;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+ 
+    <header>
+        <h1>DesignTube</h1>
+    </header>
+    <h4>(design your own pesonalised Tshits)</h4>
+<input type="file"accept="image/*">
+<img src="" alt="">
+<script>
+    let url = "https://script.google.com/macros/s/AKfycbyoJYnqrqrkQq_E-gFuNtRRayrjZOLRLeW68xpxALyYPGDMd8aWDQWcGNjwgbFijCnq-w/exec";
+    let file = document.querySelector("input");
+    let img = document.querySelector("img");
+    file.addEventListener('change',()=>{
+        let fr = new FileReader();
+        fr.addEventListener('loadend',()=>{
+            let res = fr.result;
+            img.src=res;
+            let spt = res.split("base64,")[1];
+            let obj = {
+                base64:spt,
+                type:file.files[0].type,
+                name:file.files[0].name
+            }
+            fetch(url,{
+                method:"POST",
+                body:JSON.stringify(obj)
+            })
+            .then(r=>r.text())
+            .then(data=>console.log(data))
+ 
+        })
+        fr.readAsDataURL(file.files[0])
+    })
+</script>
+    <h1 id="msg"></h1>
+    <form>
+        <div class="product" id="product1">
+            <h2>Half Sleves</h2>
+            <p>Price: 249 only</p>
+            <button onclick="addToCart('Half Sleves',249)">Add to Cart</button>
+        </div>
+
+        <div class="product" id="product2">
+            <h2>Full Sleves</h2>
+            <p>Price: 349 only</p>
+            <button onclick="addToCart('Full Sleves', 349)">Add to Cart</button>
+        </div>
+
+        <h2>Shopping Cart</h2>
+        <ul id="cart"name="cart"></ul>
+        <p>Total Price: <span id="totalPrice" name="price">0.00</span> only</p>
+
+        
+        <input type="text" name="name" placeholder='Name'><br><br>
+        <input type="text" name="email" placeholder='uploaded img file name'><br><br>
+        <input type="tel" name="phone" placeholder='Phone'><br><br>
+        <input type="text" name="cart" placeholder='name of prodect'><br><br>
+        <input type="tel" name="price" placeholder='total price'><br><br>
+        <input type="submit" id="sub">
+    </form>
+    <script>
+        let form = document.querySelector("form");
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.querySelector("#sub").value = "Submiting..";
+            let data = new FormData(form);
+            fetch('https://script.google.com/macros/s/AKfycbyfrIdK79SXIZbm686VClCLjorJzm6PJ4qx2eXkXIStRHklfUf8mnKw58iL2Iaihe96/exec', {
+                    method: "POST",
+                    body: data
+                })
+                .then(res => res.text())
+                .then(data => {
+                    document.querySelector("#msg").innerHTML = data;
+                    document.querySelector("#sub").value = "Submit"
+                });
+        })
+
+        let cart = [];
+
+        function addToCart(productName, price) {
+            cart.push({ name: productName, price: price });
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartList = document.getElementById('cart');
+            const totalPriceElement = document.getElementById('totalPrice');
+            let totalPrice = 0;
+
+            cartList.innerHTML = '';
+
+            cart.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${item.name} - ${item.price.toFixed(2)}`;
+                cartList.appendChild(listItem);
+                totalPrice += item.price;
+            });
+
+            totalPriceElement.textContent = totalPrice.toFixed(2);
+        }
+        
+
+        
+    </script>
+
+</body>
+</html>
